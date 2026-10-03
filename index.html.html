@@ -1,0 +1,383 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<meta name="theme-color" content="#08070c">
+<title>For Oishi — 19</title>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=DM+Mono:wght@400&family=Manrope:wght@300;400;500;600&display=swap');
+
+*{box-sizing:border-box;margin:0;padding:0}
+html{scroll-behavior:smooth}
+body{
+  background:#08070c;color:#f7f3f7;
+  font-family:Manrope,system-ui,sans-serif;
+  overflow-x:hidden;
+}
+body.lock{overflow:hidden}
+::selection{background:#f1a8c744;color:#fff}
+canvas#confetti{position:fixed;inset:0;pointer-events:none;z-index:50}
+.noise{position:fixed;inset:0;z-index:40;pointer-events:none;opacity:.035;background-image:url("data:image/svg+xml,%3Csvg viewBox='0 0 180 180' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.9' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='.7'/%3E%3C/svg%3E")}
+.aurora{position:fixed;width:55vw;height:55vw;max-width:650px;max-height:650px;border-radius:50%;filter:blur(110px);opacity:.13;pointer-events:none;z-index:0}
+.a1{background:#bd5d91;top:-20%;left:-15%}.a2{background:#6651b8;right:-18%;bottom:-18%}
+.progress{position:fixed;top:0;left:0;height:2px;width:0;background:#e8a2c3;z-index:60;box-shadow:0 0 18px #e8a2c3}
+.mono{font:12px "DM Mono",monospace;letter-spacing:.08em;color:#a7a0aa}
+section{position:relative;min-height:100svh;display:grid;place-items:center;padding:80px 22px;z-index:1}
+.inner{width:min(920px,100%);margin:auto}
+.center{text-align:center}
+.fade{opacity:0;transform:translateY(24px);transition:1s cubic-bezier(.2,.8,.2,1)}
+.fade.show{opacity:1;transform:none}
+.reveal{overflow:hidden}.reveal>span{display:inline-block;transform:translateY(110%);transition:1s cubic-bezier(.16,1,.3,1)}.show .reveal>span{transform:none}
+
+#intro{min-height:100svh;padding:24px}
+.intro-wrap{width:min(700px,100%);text-align:center}
+.kicker{margin-bottom:28px}
+h1{font-size:clamp(4rem,17vw,10rem);line-height:.82;font-weight:300;letter-spacing:-.08em}
+.intro-sub{margin-top:28px;font-size:clamp(1rem,3.7vw,1.25rem);line-height:1.7;color:#bcb5bf}
+.enter{
+  margin-top:42px;background:transparent;border:1px solid #ffffff28;color:#fff;
+  border-radius:999px;padding:14px 24px;font:14px Manrope;cursor:pointer;
+  transition:.3s;backdrop-filter:blur(10px)
+}
+.enter:hover{border-color:#e8a2c3aa;transform:translateY(-2px)}
+.scrollhint{position:absolute;bottom:28px;left:50%;transform:translateX(-50%);font:10px "DM Mono";color:#77717b;letter-spacing:.2em;text-transform:uppercase}
+
+.story-title{font-size:clamp(2.4rem,9vw,5.8rem);font-weight:300;letter-spacing:-.06em;line-height:.95}
+.story-copy{font-size:clamp(1rem,3.8vw,1.22rem);line-height:1.9;color:#c3bdc5;max-width:650px;margin:28px auto 0}
+.accent{color:#f0a6c5}
+
+.timeline{margin-top:60px;position:relative}
+.timeline:before{content:"";position:absolute;left:20px;top:0;bottom:0;width:1px;background:#ffffff15}
+.titem{position:relative;padding:0 0 54px 62px}
+.dot{position:absolute;left:14px;top:5px;width:13px;height:13px;border-radius:50%;border:1px solid #e8a2c3;background:#08070c;box-shadow:0 0 20px #e8a2c366}
+.tdate{font:11px "DM Mono";color:#e8a2c3;margin-bottom:10px}
+.ttext{font-size:clamp(1.05rem,4vw,1.35rem);line-height:1.65;color:#e8e2e8}
+.tsmall{margin-top:8px;color:#8d8790;font-size:.9rem}
+
+.big-number{font-size:clamp(7rem,30vw,18rem);line-height:.75;font-weight:300;letter-spacing:-.1em;background:linear-gradient(140deg,#fff,#f1a5c5,#8c7ad1);-webkit-background-clip:text;background-clip:text;color:transparent}
+.number-label{font:11px "DM Mono";letter-spacing:.15em;text-transform:uppercase;color:#88818d;margin-top:28px}
+.quote{font-size:clamp(1.5rem,6vw,3.2rem);line-height:1.25;font-weight:300;letter-spacing:-.035em;max-width:800px}
+.quote em{color:#efabc7;font-style:normal}
+
+.cards{display:grid;grid-template-columns:repeat(3,1fr);gap:12px;margin-top:48px}
+.card{
+  min-height:190px;padding:24px;border:1px solid #ffffff12;border-radius:22px;
+  background:linear-gradient(145deg,#ffffff0b,#ffffff03);backdrop-filter:blur(12px);
+  display:flex;flex-direction:column;justify-content:space-between;
+  transition:.4s;
+}
+.card:hover{transform:translateY(-7px);border-color:#e8a2c333}
+.card .emoji{font-size:1.15rem;font-family:"DM Mono",monospace;color:#f0a6c5}
+.card p{color:#aaa3ad;line-height:1.6;font-size:.92rem}
+.card strong{color:#f0e9ef;font-weight:500}
+.common-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:1px;margin-top:1px;border:1px solid #ffffff10;border-radius:22px;overflow:hidden;background:#ffffff10}
+.common-item{padding:26px;background:#0b0a10;min-height:170px}
+.common-item span{font:10px "DM Mono";color:#e8a2c3;letter-spacing:.12em}
+.common-item strong{display:block;margin-top:16px;font-size:1.05rem;font-weight:500}
+.common-item p{margin-top:10px;color:#8f8992;line-height:1.65;font-size:.9rem}
+.same-wave{margin-top:16px;border:1px solid #ffffff10;border-radius:22px;padding:28px;background:linear-gradient(145deg,#ffffff08,#ffffff02);overflow:hidden}
+.wave-label{font:10px "DM Mono",monospace;letter-spacing:.16em;color:#e8a2c3;margin-bottom:24px}
+.wave-line{display:flex;align-items:center;justify-content:space-between;gap:12px;padding:16px 0;border-bottom:1px solid #ffffff0d;color:#d8d1d9;font-size:clamp(.9rem,3.4vw,1rem)}
+.wave-line span:last-child{color:#f0a6c5;text-align:right}
+.wave-line i{font-style:normal;color:#69636c}
+.wave-note{padding-top:22px;color:#77717a;font:11px "DM Mono",monospace;line-height:1.8;letter-spacing:.04em}
+
+.confession{min-height:120svh}
+.whisper{font:11px "DM Mono";letter-spacing:.16em;text-transform:uppercase;color:#756f79;margin-bottom:35px}
+.confess-line{font-size:clamp(2.8rem,12vw,8rem);line-height:.9;font-weight:300;letter-spacing:-.075em}
+.confess-line span{display:block}
+.confess-line .pink{color:#eea2c4}
+.confess-note{margin-top:42px;color:#8e8791;font-size:1rem}
+
+.letter-shell{
+  border:1px solid #ffffff12;border-radius:28px;background:#ffffff05;
+  padding:clamp(24px,6vw,60px);box-shadow:0 30px 100px #0008;
+}
+.letter-top{display:flex;justify-content:space-between;gap:20px;border-bottom:1px solid #ffffff10;padding-bottom:22px;margin-bottom:32px}
+.letter{font-size:clamp(.98rem,3.6vw,1.08rem);line-height:2;color:#c9c2ca;white-space:pre-line}
+.letter b{color:#fff;font-weight:500}
+.signature{margin-top:42px;color:#f0a6c5;font-size:1.3rem}
+
+.final{overflow:hidden}
+.final h2{font-size:clamp(3.5rem,14vw,9rem);font-weight:300;letter-spacing:-.09em;line-height:.85}
+.final p{max-width:600px;margin:32px auto 0;color:#a9a2ab;line-height:1.8;font-size:1.05rem}
+.final .last{margin-top:45px;color:#eee;font-size:1.25rem}
+.replay{margin-top:45px}
+
+@media(max-width:680px){
+  section{padding:70px 18px}
+  .cards{grid-template-columns:1fr}
+  .card{min-height:145px}
+  .common-grid{grid-template-columns:1fr}
+  .common-item{min-height:145px}
+  .timeline:before{left:16px}
+  .titem{padding-left:48px}
+  .dot{left:10px}
+  .letter-shell{border-radius:22px}
+}
+@media(prefers-reduced-motion:reduce){
+  html{scroll-behavior:auto}
+  *,*:before,*:after{animation:none!important;transition:none!important}
+}
+</style>
+</head>
+<body class="lock">
+<div class="progress" id="progress"></div>
+<div class="aurora a1"></div><div class="aurora a2"></div>
+<div class="noise"></div>
+<canvas id="confetti"></canvas>
+
+<section id="intro">
+  <div class="intro-wrap">
+    <div class="kicker mono fade">JULY 16 → OCTOBER 4</div>
+    <h1 class="fade">for<br><span class="accent">oishi.</span></h1>
+    <p class="intro-sub fade">I was going to make you a normal birthday wish.<br>Then I remembered who I was making it for.</p>
+    <button class="enter fade" id="enter">open it</button>
+  </div>
+  <div class="scrollhint">there's something here ↓</div>
+</section>
+
+<section>
+  <div class="inner">
+    <div class="mono fade">01 / THE PART YOU DON'T REMEMBER</div>
+    <h2 class="story-title fade" style="margin-top:20px">Technically,<br>this isn't new.</h2>
+    <p class="story-copy fade">12 years ago, we were already in the same class. You probably don't remember one very important detail though.</p>
+    <div class="timeline">
+      <div class="titem fade">
+        <div class="dot"></div>
+        <div class="tdate">12 YEARS AGO</div>
+        <div class="ttext">You pulled my ears.</div>
+        <div class="tsmall">You forgot. I apparently didn't.</div>
+      </div>
+      <div class="titem fade">
+        <div class="dot"></div>
+        <div class="tdate">JULY 16</div>
+        <div class="ttext">I randomly texted you.</div>
+        <div class="tsmall">No plan. No idea where it would lead.</div>
+      </div>
+      <div class="titem fade">
+        <div class="dot"></div>
+        <div class="tdate">NOW</div>
+        <div class="ttext">Somehow, you're here.</div>
+        <div class="tsmall">And somehow, so am I.</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section>
+  <div class="inner center">
+    <div class="mono fade">02 / THE RANDOM TEXT</div>
+    <div class="big-number fade" id="days">79</div>
+    <div class="number-label fade">days since july 16</div>
+    <p class="story-copy fade">79 days doesn't sound like enough time to know someone this well.<br>And yet somehow it does.</p>
+  </div>
+</section>
+
+<section>
+  <div class="inner center">
+    <div class="mono fade">03 / SOMEHOW THIS HAPPENED</div>
+    <p class="quote fade" style="margin:30px auto 0">We can start talking and suddenly <em>everything else disappears.</em></p>
+    <div class="cards">
+      <div class="card fade"><div class="emoji">07–08</div><p><strong>hours of texting</strong><br>on an average day, and somehow we still have more to say.</p></div>
+      <div class="card fade"><div class="emoji">06–07</div><p><strong>more hours on VC</strong><br>and sometimes we somehow keep going until morning.</p></div>
+      <div class="card fade"><div class="emoji">13–14+</div><p><strong>hours together</strong><br>texting + talking until 4 or 5 AM starts feeling normal.</p></div>
+    </div>
+    <div class="common-grid">
+      <div class="common-item fade"><span>01</span><strong>same wavelength</strong><p>So many moments where one of us says something and the other was already thinking the exact same thing.</p></div>
+      <div class="common-item fade"><span>02</span><strong>same song</strong><p>Sometimes we randomly ask what the other is listening to… and somehow it's literally the same song.</p></div>
+      <div class="common-item fade"><span>03</span><strong>same exact line</strong><p>We're talking normally and then somehow both say the exact same thing at the exact same time. No context. Nothing.</p></div>
+      <div class="common-item fade"><span>04</span><strong>the random things</strong><p>Even the smallest similarities somehow turn into another “wait, you too?” moment.</p></div>
+      <div class="common-item fade"><span>05</span><strong>the conversations</strong><p>One topic becomes another, then another, and suddenly half the night is gone.</p></div>
+      <div class="common-item fade"><span>06</span><strong>the forgetting</strong><p>We start talking and somehow whatever was happening outside the call just stops mattering for a while.</p></div>
+    </div>
+    <div class="same-wave fade">
+      <div class="wave-label">HOW DOES THIS KEEP HAPPENING?</div>
+      <div class="wave-line"><span>what are you listening to?</span><i>→</i><span>the same song</span></div>
+      <div class="wave-line"><span>wait—</span><i>→</i><span>wait—</span></div>
+      <div class="wave-note">same thought. same line. same timing.<br>zero context.</div>
+    </div>
+  </div>
+</section>
+
+<section class="confession">
+  <div class="inner center">
+    <div class="whisper fade">04 / a confession i probably shouldn't make</div>
+    <div class="confess-line fade">
+      <span>Your</span>
+      <span class="pink">voice.</span>
+      <span>Your</span>
+      <span class="pink">eyes.</span>
+    </div>
+    <p class="confess-note fade">Yeah. I'm completely cooked.</p>
+  </div>
+</section>
+
+<section>
+  <div class="inner">
+    <div class="mono fade">05 / THE PART I ACTUALLY MEAN</div>
+    <div class="letter-shell fade" style="margin-top:22px">
+      <div class="letter-top">
+        <span class="mono">OISHI / 19</span>
+        <span class="mono">OCT 04</span>
+      </div>
+      <div class="letter" id="letter"></div>
+      <div class="signature">— Jin</div>
+    </div>
+  </div>
+</section>
+
+<section class="final" id="final">
+  <div class="inner center">
+    <div class="mono fade">06 / HAPPY BIRTHDAY</div>
+    <h2 class="fade" style="margin-top:24px">Happy 19th,<br><span class="accent">Oishi.</span></h2>
+    <p class="fade">I really hope this year is good to you. Take care of yourself too, okay?</p>
+    <p class="last fade">And honestly... I'm really glad I randomly texted you on July 16.</p>
+    <button class="enter replay fade" id="celebrate">make a wish</button>
+  </div>
+</section>
+
+<script>
+const letterText = `Happy 19th birthday bish
+
+Honestly idk kivabe start korbo without making this cringe so just bear with me 😭🥀
+
+It's still kinda crazy je technically amra like 12 years dhorei ekjon arekjonke chini, even though tumi probably moneo rakhoni je ekdin tumi amar kaan dhorechila lol 💀🥀
+
+And then after all those years, July 16 e ami just randomly tomake text korlam.
+
+Ami tokhon literally kichui jantam na. It was just a random text on a random day. Amar kono idea-i chilo na je oi ekta random text er por eto kichu hobe 😭🥀
+
+And now it's been 79 days.
+
+79 days of talking, random conversations, stupid arguments, teasing each other, laughing at absolutely random shit, and somehow spending basically half the day together 💀🥀
+
+Honestly, 79 days sounds like a lot and nothing at the same time.
+
+Because somehow it feels like we've known each other for way longer than that.
+
+Amader moddhe eto gula common jinis, eto gula coincidence, eto gula same thought… majhe majhe literally bhabi how tf are we this similar 😭🥀
+
+Ar jokhon amra kotha boli, somehow duijon-ei baki shob kichu bhule jai.
+
+Ki niye tension chilo, ki kaj chilo, ki korte hobe—kichui mone thake na. We just talk, laugh, argue about random shit, tease each other, and somehow hours just disappear 💀🥀
+
+And honestly, I love that.
+
+Tomake tease korte amar onek moja lage, rage bait kore tomar reaction dekhao ekta alada entertainment 💀🥀
+
+But shob joke-er baire, I genuinely care about you a lot 💗
+
+Tumi literally shobar eto care koro, sometimes nijer thekeo beshi. Tai amar honestly ekta wish holo je 19 e tumi oirokom care back pao.
+
+I hope ei year-ta tomar jonno ektu easier hoy. Aro happiness, aro peace, aro hashi, aro random beautiful moments ashuk. Ar emon onek din ashuk jekhane tumi kichukhoner jonno holeo shob tension bhule just enjoy korte paro.
+
+And selfishly, ami chai oi moment-gular kichute ami-o thaki 💗
+
+Also… ekta confession na korle birthday wish complete hobe na 😭🥀
+
+Tomar voice-er upor amar genuinely onek boro crush ache.
+
+And your eyes too.
+
+Like seriously, duita-i unfair 💀🥀
+
+Tomar shathe kotha bolar shomoy somehow amar mathar baki shob noise off hoye jay. Even jokhon amar kono pain thake or something is bothering me, tokhon tomar shathe kotha bolle ami literally oigula bhule jai.
+
+Ami pore realize kori je oh shit, ami toh eta niye upset chilam 😭🥀
+
+I don't even know exactly where all of this is going.
+
+It's been only 79 days since that random text.
+
+But somehow ei 79 diner moddhe tumi amar kache emon ekjon hoye gecho je ami actually lose korte chai na 💗
+
+And yeah…
+
+I fell for you.
+
+A lot. 💗
+
+So happy 19th, Oishi 💗
+
+I really hope this year is good to you.
+
+Ar please nijer-o care koro, okay? Tumi shobshomoy onno shobar jonno eto kichu koro, ekhon ektu nijer jonno-o koro.
+
+And honestly…
+
+ami just really glad je July 16 e ami tomake randomly text korechilam.
+
+Because I had absolutely no idea that one random message would lead me here 😭🥀
+
+79 days later, ekhane bose tomar birthday-r jonno ekta whole ass wish likhtesi 💀🥀
+
+And somehow, I wouldn't change any of it.
+
+Happy birthday bish 💗
+
+Happy 19th.`;
+
+document.getElementById("letter").textContent = letterText;
+
+const obs = new IntersectionObserver(entries=>{
+  entries.forEach(e=>{
+    if(e.isIntersecting) e.target.classList.add("show");
+  });
+},{threshold:.14});
+document.querySelectorAll(".fade").forEach(x=>obs.observe(x));
+
+const progress=document.getElementById("progress");
+addEventListener("scroll",()=>{
+  const max=document.documentElement.scrollHeight-innerHeight;
+  progress.style.width=(scrollY/max*100)+"%";
+},{passive:true});
+
+document.getElementById("enter").addEventListener("click",()=>{
+  document.body.classList.remove("lock");
+  document.querySelector("section:nth-of-type(2)").scrollIntoView({behavior:"smooth"});
+});
+
+const canvas=document.getElementById("confetti"),ctx=canvas.getContext("2d");
+let pieces=[],running=false;
+function resize(){canvas.width=innerWidth*devicePixelRatio;canvas.height=innerHeight*devicePixelRatio;ctx.setTransform(devicePixelRatio,0,0,devicePixelRatio,0,0)}
+resize(); addEventListener("resize",resize);
+
+function burst(count=180){
+  const symbols=["💀","😭","🥀","💗"];
+  pieces=Array.from({length:count},()=>({
+    x:innerWidth/2+(Math.random()-.5)*120,
+    y:innerHeight*.38,
+    vx:(Math.random()-.5)*14,
+    vy:-Math.random()*15-4,
+    g:.28+Math.random()*.18,
+    r:Math.random()*Math.PI,
+    vr:(Math.random()-.5)*.25,
+    s:10+Math.random()*16,
+    life:90+Math.random()*80,
+    sym:symbols[Math.floor(Math.random()*symbols.length)]
+  }));
+  if(!running){running=true;requestAnimationFrame(draw)}
+}
+function draw(){
+  ctx.clearRect(0,0,innerWidth,innerHeight);
+  pieces.forEach(p=>{
+    p.x+=p.vx;p.y+=p.vy;p.vy+=p.g;p.r+=p.vr;p.life--;
+    ctx.save();ctx.translate(p.x,p.y);ctx.rotate(p.r);
+    ctx.globalAlpha=Math.max(0,p.life/120);
+    ctx.font=`${p.s}px system-ui`;ctx.textAlign="center";ctx.textBaseline="middle";
+    ctx.fillText(p.sym,0,0);ctx.restore();
+  });
+  pieces=pieces.filter(p=>p.life>0 && p.y<innerHeight+40);
+  if(pieces.length){requestAnimationFrame(draw)}else{running=false}
+}
+document.getElementById("celebrate").addEventListener("click",()=>{
+  burst(240);
+  document.getElementById("final").scrollIntoView({behavior:"smooth"});
+});
+
+setTimeout(()=>burst(90),1200);
+</script>
+</body>
+</html>
